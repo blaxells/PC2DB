@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mantenimiento de Pacientes</title>
+</head>
+<body>
+    <h1>Mantenimiento de Pacientes</h1>
+    <button onclick="showCreateForm()">Crear</button>
+    <button onclick="fetchPacientes()">Listar</button>
+    <div id="create-form" style="display:none;">
+        <h2>Crear Paciente</h2>
+        <form action="/paciente" method="POST">
+            <label>Login:</label><input type="text" name="login" required><br>
+            <label>Password:</label><input type="text" name="password" required><br>
+            <label>Apellidos:</label><input type="text" name="apellidos" required><br>
+            <label>Nombres:</label><input type="text" name="nombres" required><br>
+            <label>Móvil:</label><input type="text" name="movil" required><br>
+            <label>Correo:</label><input type="email" name="correo" required><br>
+            <label>Dirección:</label><input type="text" name="direccion" required><br>
+            <button type="submit">Crear</button>
+        </form>
+    </div>
+    <div id="update-form" style="display:none;">
+        <h2>Actualizar Paciente</h2>
+        <form id="update-patient-form" method="POST">
+            <input type="hidden" name="idpaciente" id="update-idpaciente">
+            <label>Login:</label><input type="text" name="login" id="update-login" required><br>
+            <label>Password:</label><input type="text" name="password" id="update-password" required><br>
+            <label>Apellidos:</label><input type="text" name="apellidos" id="update-apellidos" required><br>
+            <label>Nombres:</label><input type="text" name="nombres" id="update-nombres" required><br>
+            <label>Móvil:</label><input type="text" name="movil" id="update-movil" required><br>
+            <label>Correo:</label><input type="email" name="correo" id="update-correo" required><br>
+            <label>Dirección:</label><input type="text" name="direccion" id="update-direccion" required><br>
+            <button type="submit">Actualizar</button>
+        </form>
+    </div>
+    <h2>Lista de Pacientes</h2>
+    <div id="pacientes-list">
+    </div>
+
+    <script>
+        function showCreateForm() {
+            document.getElementById('create-form').style.display = 'block';
+        }
+        function fetchPacientes() {
+            fetch('/paciente')
+                .then(response => response.json())
+                .then(data => {
+                    const pacientesList = document.getElementById('pacientes-list');
+                    pacientesList.innerHTML = '';
+                    data.forEach(paciente => {
+                        const div = document.createElement('div');
+                        div.innerHTML = `
+                            <p>${paciente.nombres} ${paciente.apellidos} - ${paciente.movil}</p>
+                            <form action="/eliminar/${paciente.idpaciente}" method="POST" style="display:inline;">
+                                <button type="submit">Eliminar</button>
+                            </form>
+                            <button onclick="showUpdateForm(${paciente.idpaciente}, '${paciente.login}', '${paciente.password}', '${paciente.apellidos}', '${paciente.nombres}', '${paciente.movil}', '${paciente.correo}', '${paciente.direccion}')">Actualizar</button>
+                        `;
+                        pacientesList.appendChild(div);
+                    });
+                });
+        }
+        function showUpdateForm(id, login, password, apellidos, nombres, movil, correo, direccion) {
+            document.getElementById('update-idpaciente').value = id;
+            document.getElementById('update-login').value = login;
+            document.getElementById('update-password').value = password;
+            document.getElementById('update-apellidos').value = apellidos;
+            document.getElementById('update-nombres').value = nombres;
+            document.getElementById('update-movil').value = movil;
+            document.getElementById('update-correo').value = correo;
+            document.getElementById('update-direccion').value = direccion;
+            document.getElementById('update-form').style.display = 'block';
+            document.getElementById('update-patient-form').action = `/actualizar/${id}`;
+            
+        }
+    </script>
+</body>
+</html>
